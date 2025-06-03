@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Comprehensive Cybersecurity Flashcards</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif, system-ui, -apple-system,
+          BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+          'Noto Sans', sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+          'Segoe UI Symbol', 'Noto Color Emoji';
+        background-color: #f8fafc; /* slate-50 */
+        color: #334155; /* slate-700 */
+      }
+      .flashcard-container {
+        width: 100%;
+        max-width: 600px; /* Increased max-width for better readability */
+        min-height: 380px; /* Increased min-height */
+        perspective: 1500px; /* Increased perspective for smoother flip */
+      }
+      .flashcard {
+        width: 100%;
+        height: 100%;
+        min-height: 380px; /* Match container */
+        position: relative;
+        transform-style: preserve-3d;
+        transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        cursor: pointer;
+      }
+      .flashcard.flipped {
+        transform: rotateY(180deg);
+      }
+      .flashcard-face {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        min-height: 380px; /* Match container */
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 24px; /* p-6 */
+        box-sizing: border-box;
+        border-radius: 0.75rem; /* rounded-xl */
+        text-align: center;
+        overflow-y: auto; /* Enable scroll for long definitions */
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+      }
+      .flashcard-front {
+        background-color: #38bdf8; /* sky-400 */
+        color: white;
+      }
+      .flashcard-back {
+        background-color: #2dd4bf; /* teal-400 */
+        color: #0f766e; /* teal-700 text for better contrast on teal-400 */
+        transform: rotateY(180deg);
+      }
+      .flashcard-label {
+        font-size: 0.875rem; /* text-sm */
+        font-weight: 700; /* font-bold */
+        color: rgba(255, 255, 255, 0.75); /* Lighter label on dark bg */
+        margin-bottom: 0.75rem; /* mb-3 */
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .flashcard-back .flashcard-label {
+        color: #134e4a; /* teal-900 - darker label on lighter back */
+      }
+      .flashcard-term-content {
+        font-size: 1.875rem; /* text-3xl */
+        font-weight: 700; /* font-bold */
+      }
+      .flashcard-definition-content {
+        font-size: 1.125rem; /* text-lg */
+        line-height: 1.6;
+      }
+      .flashcard-face::-webkit-scrollbar {
+        width: 10px;
+      }
+      .flashcard-face::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: 10px;
+      }
+      .flashcard-face::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+      }
+      .flashcard-face::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+      .category-button-style {
+        background-color: #0ea5e9; /* sky-500 */
+        color: white;
+        font-weight: 600; /* semibold */
+        padding: 0.75rem 1rem; /* py-3 px-4 */
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+        transition: all 0.2s ease-in-out;
+      }
+      .category-button-style:hover {
+        background-color: #0284c7; /* sky-600 */
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+          0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+      }
+      .nav-button-style {
+        background-color: #475569; /* slate-600 */
+        color: white;
+        font-weight: 600; /* semibold */
+        padding: 0.625rem 1.25rem; /* py-2.5 px-5 */
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease-in-out;
+      }
+      .nav-button-style:hover:not(:disabled) {
+        background-color: #334155; /* slate-700 */
+        transform: translateY(-1px);
+      }
+      .nav-button-style:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .action-button-style {
+        background-color: #0d9488; /* teal-600 */
+        color: white;
+        font-weight: 600; /* semibold */
+        padding: 0.625rem 1.25rem; /* py-2.5 px-5 */
+        border-radius: 0.5rem; /* rounded-lg */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+          0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        transition: all 0.2s ease-in-out;
+      }
+      .action-button-style:hover {
+        background-color: #0f766e; /* teal-700 */
+        transform: translateY(-1px);
+      }
+    </style>
+  </head>
+  <body
+    class="flex flex-col items-center justify-center min-h-screen p-4 selection:bg-sky-100 selection:text-sky-700"
+  >
+    <main
+      class="container mx-auto p-5 sm:p-8 bg-white shadow-xl rounded-lg w-full max-w-4xl"
+    >
+      <header class="text-center mb-8">
+        <h1 class="text-4xl sm:text-5xl font-extrabold text-sky-600">
+          Comprehensive Cybersecurity Flashcards
+        </h1>
+      </header>
+
+      <section id="category-selection-view">
+        <h2
+          class="text-2xl sm:text-3xl font-semibold text-center text-slate-700 mb-4"
+        >
+          Welcome, Cybersecurity Scholar!
+        </h2>
+        <p class="text-center text-slate-600 mb-8 text-lg leading-relaxed">
+          This interactive flashcard tool is designed to help you master the
+          extensive vocabulary of cybersecurity. Select a category below to dive
+          into specific topics and test your knowledge. Click on any card to
+          reveal its definition. Good luck!
+        </p>
+        <div
+          id="category-buttons-container"
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5"
+        ></div>
+      </section>
+
+      <section id="flashcard-view" class="hidden">
+        <div class="text-center mb-6">
+          <p class="text-2xl font-semibold text-teal-600">
+            Category:
+            <span id="current-category-display" class="font-bold"></span>
+          </p>
+          <p class="text-lg text-slate-500 mt-1" id="card-counter">
+            Card 0 of 0
+          </p>
+        </div>
+        <p class="text-center text-slate-600 mb-6 text-md leading-relaxed">
+          Click the card below to flip between the term and its definition. Use
+          the "Previous" and "Next" buttons to navigate through your selected
+          deck. Press "Choose New Category" to explore other topics.
+        </p>
+
+        <div class="flashcard-container mx-auto mb-8">
+          <div id="flashcard" class="flashcard">
+            <div class="flashcard-face flashcard-front">
+              <div>
+                <div class="flashcard-label">Term</div>
+                <div
+                  id="flashcard-term-content"
+                  class="flashcard-term-content"
+                ></div>
+              </div>
+            </div>
+            <div class="flashcard-face flashcard-back">
+              <div>
+                <div class="flashcard-label">Definition</div>
+                <div
+                  id="flashcard-definition-content"
+                  class="flashcard-definition-content"
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex justify-center items-center space-x-4 mb-8">
+          <button id="prev-card-button" class="nav-button-style">
+            <span>&#9664;</span> Previous
+          </button>
+          <button id="next-card-button" class="nav-button-style">
+            Next <span>&#9654;</span>
+          </button>
+        </div>
+
+        <div class="text-center">
+          <button id="return-to-categories-button" class="action-button-style">
+            Choose New Category
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer class="text-center mt-10 mb-6 text-sm text-slate-500">
+      <p>
+        &copy; <span id="current-year"></span> Cybersecurity Flashcard Study
+        Tool. By Osiris Loera
+      </p>
+    </footer>
+
+    <script>
+      const vocabularyData = {
+        'Core Concepts': [
+          {
+            term: 'Acceptable Use Policy (AUP)',
+            definition:
+              'A policy that defines the rules and constraints for how a network, system, or service may be used. ',
+          },
+          {
+            term: 'Access Control',
+            definition:
+              'The process of granting or denying specific requests to obtain and use information and related information processing services; and to enter specific physical facilities. [cite: 3, 4]',
+          },
+          {
+            term: 'Asset',
+            definition:
+              'Anything that has value to an organization, including data, hardware, software, personnel, and physical property. ',
+          },
+          {
+            term: 'Authentication',
+            definition:
+              'The process of verifying the identity of a user, process, or device, often as a prerequisite to allowing access to resources in an information system. ',
+          },
+          {
+            term: 'Authorization',
+            definition:
+              'The process of granting or denying access rights to a user, program, or process. ',
+          },
+          {
+            term: 'Availability',
+            definition:
+              'The assurance that systems and data are accessible by authorized users when needed. Part of the CIA triad. ',
+          },
+          {
+            term: 'Baseline',
+            definition:
+              'A standardized level of security configuration for a system or network. ',
+          },
+          {
+            term: 'Business Continuity Plan (BCP)',
+            definition:
+              'A plan to continue operations if a place of business is affected by different levels of disaster. ',
+          },
+          {
+            term: 'CIA Triad',
+            definition:
+              'Confidentiality, Integrity, Availability: A model designed to guide policies for information security within an organization. ',
+          },
+          {
+            term: 'Compliance',
+            definition:
+              'Adherence to a set of rules, standards, laws, or regulations. ',
+          },
+          {
+            term: 'Confidentiality',
+            definition:
+              'Ensuring that information is not disclosed to unauthorized individuals, entities, or processes. Part of the CIA triad. ',
+          },
+          {
+            term: 'Control (Security Control)',
+            definition:
+              'A safeguard or countermeasure prescribed for an information system or an organization designed to protect the confidentiality, integrity, and availability of its information and to meet a set of defined security requirements. ',
+          },
+          {
+            term: 'Cybersecurity',
+            definition:
+              'The practice of protecting systems, networks, and programs from digital attacks. ',
+          },
+          {
+            term: 'Data Classification',
+            definition:
+              'The process of organizing data into categories based on its sensitivity, value, and criticality to the organization. ',
+          },
+          {
+            term: 'Defense in Depth',
+            definition:
+              'A security strategy that uses multiple layers of security controls to protect assets. ',
+          },
+          {
+            term: 'Integrity',
+            definition:
+              'Maintaining the accuracy and completeness of data over its entire lifecycle. Part of the CIA triad. ',
+          },
+          {
+            term: 'Least Privilege',
+            definition:
+              'The principle of providing only the minimum necessary access rights and permissions for a user, account, or process to perform its intended function. ',
+          },
+          {
+            term: 'Policy (Security Policy)',
+            definition:
+              'A document that outlines the rules, expectations, and procedures for security within an organization. ',
+          },
+          {
+            term: 'Risk',
+            definition:
+              'The potential for loss, damage, or destruction of an asset as a result of a threat exploiting a vulnerability. ',
+          },
+          {
+            term: 'Risk Management',
+            definition:
+              "The process of identifying, assessing, and controlling threats to an organization's capital and earnings. ",
+          },
+          {
+            term: 'Threat',
+            definition:
+              'Any circumstance or event with the potential to adversely impact organizational operations, assets, or individuals through an information system. ',
+          },
+          {
+            term: 'Vulnerability',
+            definition:
+              'A weakness in an information system, system security procedures, internal controls, or implementation that could be exploited by a threat source. ',
+          },
+        ],
+        'Common Attacks & Malware': [
+          {
+            term: 'Adversarial AI',
+            definition:
+              'A field of machine learning that attempts to fool models through malicious input. ',
+          },
+          {
+            term: 'Adware',
+            definition:
+              'Software that automatically displays or downloads advertising material (often unwanted) when a user is online. ',
+          },
+          {
+            term: 'Advanced Persistent Threat (APT)',
+            definition:
+              'A sophisticated, typically state-sponsored, cyberattack in which an intruder establishes an undetected, long-term presence in a network to mine highly sensitive data. ',
+          },
+          {
+            term: 'ARP Poisoning (ARP Spoofing)',
+            definition:
+              "A cyber attack over a LAN sending malicious ARP packets to associate an attacker's MAC address with another host's IP. ",
+          },
+          {
+            term: 'Backdoor',
+            definition:
+              'A hidden method of bypassing normal authentication or encryption in a computer, product, or embedded device. ',
+          },
+          {
+            term: 'Botnet',
+            definition:
+              "A network of private computers infected with malicious software and controlled as a group without the owners' knowledge, e.g., to send spam or conduct DDoS attacks. ",
+          },
+          {
+            term: 'Brute-Force Attack',
+            definition:
+              'A trial-and-error method used to obtain information such as a user password or PIN. ',
+          },
+          {
+            term: 'Buffer Overflow',
+            definition:
+              "An anomaly where a program, writing data to a buffer, overruns the buffer's boundary and overwrites adjacent memory. ",
+          },
+          {
+            term: 'Clickjacking',
+            definition:
+              'A malicious technique tricking a user into clicking something different from what they perceive, potentially revealing confidential info. ',
+          },
+          {
+            term: 'Code Injection',
+            definition:
+              'Exploitation of a bug by processing invalid data, allowing an attacker to introduce code into a program. [cite: 70, 71]',
+          },
+          {
+            term: 'Cross-Site Request Forgery (CSRF/XSRF)',
+            definition:
+              "An attack that forces an end user to execute unwanted actions on a web application in which they're currently authenticated. ",
+          },
+          {
+            term: 'Cross-Site Scripting (XSS)',
+            definition:
+              'A web application vulnerability enabling attackers to inject client-side scripts into pages viewed by others. ',
+          },
+          {
+            term: 'DDoS (Distributed Denial of Service)',
+            definition:
+              'An attack where multiple compromised systems attack a target, causing a denial of service. ',
+          },
+          {
+            term: 'Denial of Service (DoS)',
+            definition:
+              'An attack meant to shut down a machine or network, making it inaccessible to its intended users. ',
+          },
+          {
+            term: 'Drive-by Download',
+            definition:
+              'The unintentional download of software from the Internet. ',
+          },
+          {
+            term: 'Exploit',
+            definition:
+              'Software, data, or commands taking advantage of a bug or vulnerability for unintended behavior. ',
+          },
+          {
+            term: 'Fileless Malware',
+            definition:
+              'Malware using legitimate programs to infect a computer, not relying on files, leaving no footprint. [cite: 178, 179]',
+          },
+          {
+            term: 'Logic Bomb',
+            definition:
+              'Code intentionally inserted into software that sets off a malicious function when specified conditions are met. ',
+          },
+          {
+            term: 'Malware (Malicious Software)',
+            definition:
+              'Any software intentionally designed to cause damage to a computer, server, client, or computer network. ',
+          },
+          {
+            term: 'Man-in-the-Middle (MitM) Attack',
+            definition:
+              'An attack where the attacker secretly relays and possibly alters communications between two parties. ',
+          },
+          {
+            term: 'Phishing',
+            definition:
+              'A social engineering attack using deceptive communications to steal user data, like login credentials. ',
+          },
+          {
+            term: 'Ransomware',
+            definition:
+              'Malware that blocks access to data by encrypting it, demanding money for release. ',
+          },
+          {
+            term: 'Rootkit',
+            definition:
+              'A program designed to provide continued privileged access to a computer while actively hiding its presence. ',
+          },
+          {
+            term: 'Social Engineering',
+            definition:
+              'The use of deception to manipulate individuals into divulging confidential information or performing actions for fraudulent purposes. ',
+          },
+          {
+            term: 'Spyware',
+            definition:
+              'Software enabling covert information gathering about computer activities by transmitting data. ',
+          },
+          {
+            term: 'SQL Injection (SQLi)',
+            definition:
+              'A code injection technique used to attack data-driven applications by inserting malicious SQL statements for execution. ',
+          },
+          {
+            term: 'Trojan Horse (Trojan)',
+            definition:
+              "Malware often disguised as legitimate software, used to gain access to users' systems. ",
+          },
+          {
+            term: 'Virus',
+            definition:
+              'Malware that replicates by modifying other computer programs and inserting its own code. ',
+          },
+          {
+            term: 'Watering Hole Attack',
+            definition:
+              'Compromising users by infecting websites they are known to visit. ',
+          },
+          {
+            term: 'Worm',
+            definition:
+              'Standalone malware that replicates to spread to other computers, often via network vulnerabilities. ',
+          },
+          {
+            term: 'Zero-Day Attack',
+            definition:
+              'An attack that exploits a previously unknown security vulnerability for which no patch or fix has yet been released. ',
+          },
+        ],
+        'Network Security': [
+          {
+            term: 'Air Gap',
+            definition:
+              'A security measure where a computer or network is physically isolated from other networks to prevent unauthorized access. ',
+          },
+          {
+            term: 'Bastion Host',
+            definition:
+              'A special-purpose computer on a network designed and configured to withstand attacks, typically hosting a single application. [cite: 30, 31]',
+          },
+          {
+            term: 'DMZ (Demilitarized Zone)',
+            definition:
+              "A subnetwork containing and exposing an organization's external-facing services to an untrusted network. ",
+          },
+          {
+            term: 'DNS Hijacking',
+            definition:
+              'An attack incorrectly resolving DNS queries to redirect users to malicious sites. ',
+          },
+          {
+            term: 'DNS Poisoning (DNS Cache Poisoning)',
+            definition:
+              'An attack exploiting DNS vulnerabilities to divert Internet traffic to fake servers. ',
+          },
+          {
+            term: 'Egress Filtering',
+            definition:
+              'Monitoring and potentially restricting outbound information flow from one network to another. ',
+          },
+          {
+            term: 'Firewall',
+            definition:
+              'A network security system that monitors and controls incoming and outgoing network traffic based on predetermined security rules. ',
+          },
+          {
+            term: 'Honeypot',
+            definition:
+              'A decoy system set to detect, deflect, or counteract unauthorized use of information systems. [cite: 203, 204]',
+          },
+          {
+            term: 'IDS (Intrusion Detection System)',
+            definition:
+              'A device or software application that monitors a network or systems for malicious activity or policy violations. ',
+          },
+          {
+            term: 'IPS (Intrusion Prevention System)',
+            definition:
+              'Network security technology that examines traffic to detect and prevent vulnerability exploits. ',
+          },
+          {
+            term: 'Ingress Filtering',
+            definition:
+              'Filtering incoming packets to a network, typically to prevent spoofed IP addresses. ',
+          },
+          {
+            term: 'LAN (Local Area Network)',
+            definition:
+              'A computer network interconnecting computers within a limited area like an office or home. ',
+          },
+          {
+            term: 'Load Balancer',
+            definition:
+              'A device that distributes network or application traffic across multiple servers. ',
+          },
+          {
+            term: 'NAC (Network Access Control)',
+            definition:
+              'An approach unifying endpoint security technology, user/system authentication, and network security enforcement. ',
+          },
+          {
+            term: 'NAT (Network Address Translation)',
+            definition:
+              'Remapping an IP address space by modifying network address info in IP packet headers. ',
+          },
+          {
+            term: 'Network Segmentation',
+            definition:
+              'Splitting a computer network into subnetworks (segments) to boost performance and improve security. ',
+          },
+          {
+            term: 'NGFW (Next-Generation Firewall)',
+            definition:
+              'A firewall combining traditional features with advanced functionalities like DPI and IPS. ',
+          },
+          {
+            term: 'Packet Filtering',
+            definition:
+              'A firewall technique controlling network access by monitoring packets based on IP addresses, protocols, and ports. ',
+          },
+          {
+            term: 'Port Scanning',
+            definition:
+              "Systematically scanning a computer's ports to find open services. ",
+          },
+          {
+            term: 'Proxy Server',
+            definition:
+              'A server acting as an intermediary for client requests to other servers. ',
+          },
+          {
+            term: 'Router',
+            definition:
+              'A networking device that forwards data packets between computer networks. ',
+          },
+          {
+            term: 'SSID (Service Set Identifier)',
+            definition:
+              'The primary name associated with an 802.11 wireless local area network (WLAN). ',
+          },
+          {
+            term: 'Subnet',
+            definition: 'A logical subdivision of an IP network. ',
+          },
+          {
+            term: 'VPN (Virtual Private Network)',
+            definition:
+              'Extends a private network across a public network, enabling secure data transmission as if directly connected. ',
+          },
+          {
+            term: 'WAF (Web Application Firewall)',
+            definition:
+              'A firewall that monitors, filters, or blocks HTTP traffic to and from a web application. ',
+          },
+          {
+            term: 'Wi-Fi',
+            definition:
+              'Technology for wireless local area networking based on IEEE 802.11 standards. ',
+          },
+          {
+            term: 'Wireless Access Point (WAP)',
+            definition:
+              'A networking hardware device that allows Wi-Fi devices to connect to a wired network. ',
+          },
+        ],
+        'Cryptography & Data Protection': [
+          {
+            term: 'AES (Advanced Encryption Standard)',
+            definition:
+              'A symmetric block cipher widely used by the U.S. government and globally to encrypt sensitive data. ',
+          },
+          {
+            term: 'Asymmetric Encryption (Public-Key Cryptography)',
+            definition:
+              'A cryptographic system using pairs of keys: public keys (widely disseminated) and private keys (known only to owner). ',
+          },
+          {
+            term: 'Block Cipher',
+            definition:
+              'An encryption algorithm operating on fixed-length groups of bits (blocks) with an unvarying transformation. ',
+          },
+          {
+            term: 'CA (Certificate Authority)',
+            definition:
+              'An entity that issues digital certificates, which certify ownership of a public key. [cite: 51, 52]',
+          },
+          {
+            term: 'Cipher',
+            definition:
+              'An algorithm for performing encryption or decryption. ',
+          },
+          {
+            term: 'Ciphertext',
+            definition:
+              'The result of encryption performed on plaintext using a cipher. ',
+          },
+          {
+            term: 'Cryptography',
+            definition:
+              'The practice and study of techniques for secure communication in the presence of adversaries. ',
+          },
+          {
+            term: 'Data Loss Prevention (DLP)',
+            definition:
+              "A strategy with tools and processes to ensure sensitive data isn't lost, misused, or accessed by unauthorized users. ",
+          },
+          {
+            term: 'Decryption',
+            definition:
+              'The process of transforming ciphertext back into plaintext. ',
+          },
+          {
+            term: 'Digital Certificate',
+            definition:
+              'An electronic document used to prove the ownership of a public key. ',
+          },
+          {
+            term: 'Digital Signature',
+            definition:
+              'A mathematical scheme for verifying the authenticity of digital messages or documents. ',
+          },
+          {
+            term: 'ECC (Elliptic Curve Cryptography)',
+            definition:
+              'Public-key cryptography based on the algebraic structure of elliptic curves over finite fields. ',
+          },
+          {
+            term: 'Encryption',
+            definition:
+              'The process of converting information or data into a code, especially to prevent unauthorized access. ',
+          },
+          {
+            term: 'Hash Function',
+            definition:
+              'An algorithm mapping data of arbitrary size to a fixed-size bit string (hash); a one-way function. ',
+          },
+          {
+            term: 'Hashing',
+            definition:
+              'The process of using a hash function to transform data. ',
+          },
+          {
+            term: 'Key',
+            definition:
+              'In cryptography, a piece of information (parameter) determining the functional output of a cryptographic algorithm. ',
+          },
+          {
+            term: 'Key Management',
+            definition:
+              'Managing cryptographic keys including generation, exchange, storage, use, destruction, and replacement. [cite: 265, 266]',
+          },
+          {
+            term: 'MD5 (Message Digest 5)',
+            definition:
+              'A widely used hash function producing a 128-bit hash value, now considered insecure for crypto purposes. [cite: 293, 294]',
+          },
+          {
+            term: 'PKI (Public Key Infrastructure)',
+            definition:
+              'A set of roles, policies, hardware, software, and procedures for managing digital certificates and public-key encryption. ',
+          },
+          {
+            term: 'Plaintext',
+            definition: 'Unencrypted information. ',
+          },
+          {
+            term: 'RSA',
+            definition:
+              'A public-key cryptosystem widely used for secure data transmission. ',
+          },
+          {
+            term: 'Salt',
+            definition:
+              'Random data used as an additional input to a hash function for passwords, defending against dictionary/rainbow table attacks. [cite: 459, 460]',
+          },
+          {
+            term: 'SHA (Secure Hash Algorithm)',
+            definition:
+              'A family of cryptographic hash functions published by NIST (e.g., SHA-256). [cite: 499, 500]',
+          },
+          {
+            term: 'SSL (Secure Sockets Layer)',
+            definition:
+              'Standard security technology for encrypted links between web server and browser; deprecated for TLS. ',
+          },
+          {
+            term: 'Steganography',
+            definition:
+              'The practice of concealing a file, message, image, or video within another. ',
+          },
+          {
+            term: 'Symmetric Encryption (Secret-Key Cryptography)',
+            definition:
+              'Encryption where only one secret key is used for both encryption and decryption. ',
+          },
+          {
+            term: 'TLS (Transport Layer Security)',
+            definition:
+              'A cryptographic protocol for secure communication over a network; successor to SSL. [cite: 571, 572]',
+          },
+          {
+            term: 'Tokenization',
+            definition:
+              'Replacing sensitive data with unique identification symbols that retain essential info without compromising security. ',
+          },
+        ],
+        'Security Operations & Incident Response': [
+          {
+            term: 'Alert',
+            definition:
+              'A notification that a specific event or set of events has occurred, often indicating a potential security issue. ',
+          },
+          {
+            term: 'Audit Trail (Audit Log)',
+            definition:
+              'A chronological record of system activities enabling reconstruction and examination of events. ',
+          },
+          {
+            term: 'Behavioral Analysis',
+            definition:
+              'Observing and analyzing system, user, or network traffic behavior to detect anomalies or malicious activities. ',
+          },
+          {
+            term: 'Chain of Custody',
+            definition:
+              'Chronological documentation showing seizure, custody, control, transfer, analysis, and disposition of evidence. ',
+          },
+          {
+            term: 'Containment',
+            definition:
+              'The phase in incident response taking actions to limit exposure and prevent further damage. ',
+          },
+          {
+            term: 'Digital Forensics',
+            definition:
+              'Recovery and investigation of material found in digital devices, often related to computer crime. ',
+          },
+          {
+            term: 'EDR (Endpoint Detection and Response)',
+            definition:
+              'Technology for continuous monitoring and response to advanced threats on endpoints. ',
+          },
+          {
+            term: 'Eradication',
+            definition:
+              'The incident response phase where components of the incident (e.g., malware) are removed. ',
+          },
+          {
+            term: 'Event',
+            definition: 'Any observable occurrence in a system or network. ',
+          },
+          {
+            term: 'Event Log',
+            definition:
+              'A file containing a record of events that have occurred on a computer or network. ',
+          },
+          {
+            term: 'Incident',
+            definition:
+              'A security event compromising the integrity, confidentiality, or availability of an information asset. ',
+          },
+          {
+            term: 'Incident Handling',
+            definition:
+              'The process of responding to and managing a security incident. ',
+          },
+          {
+            term: 'Incident Response Plan (IRP)',
+            definition:
+              'A documented, organized approach to addressing and managing the aftermath of a security breach or cyberattack. ',
+          },
+          {
+            term: 'Indicator of Attack (IOA)',
+            definition:
+              "Evidence or clues suggesting an attack is in progress, focusing on 'how' an attacker operates. [cite: 233, 234]",
+          },
+          {
+            term: 'Indicator of Compromise (IOC)',
+            definition:
+              "Evidence on a computer indicating network security has been breached, focusing on 'what' was left. ",
+          },
+          {
+            term: 'Log Analysis',
+            definition:
+              'Reviewing, interpreting, and understanding computer-generated records (logs). ',
+          },
+          {
+            term: 'Monitoring',
+            definition:
+              'Ongoing collection and analysis of data to detect potential security threats or issues. ',
+          },
+          {
+            term: 'Playbook (Security Playbook)',
+            definition:
+              'Predefined steps and actions for responding to specific security incidents or events. ',
+          },
+          {
+            term: 'Recovery',
+            definition:
+              'The process of restoring systems and data after a security incident or disaster. ',
+          },
+          {
+            term: 'Remediation',
+            definition:
+              'The process of fixing or eliminating vulnerabilities or the effects of a security incident. ',
+          },
+          {
+            term: 'Runbook',
+            definition:
+              'A compilation of routine procedures and operations for system administrators or operators. ',
+          },
+          {
+            term: 'SIEM (Security Information and Event Management)',
+            definition:
+              'Software combining SIM and SEM for real-time analysis of security alerts. [cite: 482, 483]',
+          },
+          {
+            term: 'SOC (Security Operations Center)',
+            definition:
+              'A centralized unit dealing with security issues on an organizational and technical level. ',
+          },
+          {
+            term: 'SOAR (Security Orchestration, Automation and Response)',
+            definition:
+              'Technologies enabling collection of threat data/alerts and automated responses via workflows. ',
+          },
+          {
+            term: 'Tabletop Exercise',
+            definition:
+              'Discussion-based session where team members discuss roles and responses to an emergency situation. ',
+          },
+          {
+            term: 'Threat Hunting',
+            definition:
+              'Proactive and iterative searching through networks, endpoints, and datasets to detect advanced threats. ',
+          },
+          {
+            term: 'Triage',
+            definition:
+              'Sorting and prioritizing security alerts or incidents based on severity and potential impact. ',
+          },
+        ],
+        'Access Control & Identity Management': [
+          {
+            term: 'Access Control List (ACL)',
+            definition:
+              'A list of permissions specifying user/system process access to objects and allowed operations. ',
+          },
+          {
+            term: 'Biometrics',
+            definition:
+              'Authentication techniques relying on measurable, automatically checkable physical characteristics (e.g., fingerprints). [cite: 34, 35]',
+          },
+          {
+            term: 'Credential',
+            definition:
+              'Information used to verify identity, such as a username and password. ',
+          },
+          {
+            term: 'Discretionary Access Control (DAC)',
+            definition:
+              "Access control policy determined by an object's owner, who decides access and privileges. [cite: 139, 140]",
+          },
+          {
+            term: 'Federated Identity',
+            definition:
+              "A system where a user's single authentication token is trusted across multiple IT systems or organizations. ",
+          },
+          {
+            term: 'IAM (Identity and Access Management)',
+            definition:
+              'A framework of policies and technologies ensuring right users have appropriate access to tech resources. ',
+          },
+          {
+            term: 'Kerberos',
+            definition:
+              'Network authentication protocol using tickets for secure identity proof over non-secure networks. ',
+          },
+          {
+            term: 'LDAP (Lightweight Directory Access Protocol)',
+            definition:
+              'An open standard protocol for accessing and maintaining distributed directory information services over IP networks. ',
+          },
+          {
+            term: 'MAC (Mandatory Access Control)',
+            definition:
+              "Access control where the OS constrains a subject's ability to access or operate on an object. ",
+          },
+          {
+            term: 'MFA (Multi-Factor Authentication)',
+            definition:
+              'Security system requiring more than one authentication method from independent categories to verify identity. ',
+          },
+          {
+            term: 'OAuth (Open Authorization)',
+            definition:
+              'An open standard for access delegation, letting users grant sites access to their info on other sites without passwords. ',
+          },
+          {
+            term: 'One-Time Password (OTP)',
+            definition:
+              'A password valid for only one login session or transaction. ',
+          },
+          {
+            term: 'Password',
+            definition:
+              'A secret word or string of characters for authentication to prove identity or gain access. ',
+          },
+          {
+            term: 'Password Manager',
+            definition:
+              'Software that helps users store and organize passwords. ',
+          },
+          {
+            term: 'Privilege Escalation',
+            definition:
+              'Exploiting a bug or flaw to gain elevated access to normally protected resources. ',
+          },
+          {
+            term: 'RBAC (Role-Based Access Control)',
+            definition:
+              "Restricting network access based on individual users' roles within an enterprise. ",
+          },
+          {
+            term: 'RADIUS (Remote Authentication Dial-In User Service)',
+            definition:
+              'Protocol for centralized AAA management for users connecting to a network service. ',
+          },
+          {
+            term: 'SAML (Security Assertion Markup Language)',
+            definition:
+              'An open standard for exchanging authentication and authorization data between parties (IdP and SP). ',
+          },
+          {
+            term: 'Single Sign-On (SSO)',
+            definition:
+              'Authentication allowing a user to log in with one ID/password to multiple related, independent systems. ',
+          },
+          {
+            term: 'TACACS+ (Terminal Access Controller Access-Control System Plus)',
+            definition:
+              'Authentication protocol for centralized validation of users accessing routers or network access servers. ',
+          },
+          {
+            term: 'Two-Factor Authentication (2FA)',
+            definition:
+              'MFA type requiring two methods to verify identity, often used interchangeably with MFA. ',
+          },
+        ],
+        'Policies, Governance & Compliance': [
+          {
+            term: 'Audit Trail (Audit Log)',
+            definition: 'A chronological record of system activities. ',
+          },
+          {
+            term: 'Business Impact Analysis (BIA)',
+            definition:
+              'Process to determine potential effects of an interruption to critical business operations. ',
+          },
+          {
+            term: 'Common Criteria (CC)',
+            definition:
+              'An international standard (ISO/IEC 15408) for computer security certification. ',
+          },
+          {
+            term: 'Common Vulnerabilities and Exposures (CVE)',
+            definition:
+              'A list of publicly disclosed computer security flaws, each with an ID. [cite: 76, 77]',
+          },
+          {
+            term: 'Common Vulnerability Scoring System (CVSS)',
+            definition:
+              'An open standard for assessing the severity of computer system security vulnerabilities. ',
+          },
+          {
+            term: 'Compliance',
+            definition:
+              'Adherence to a set of rules, standards, laws, or regulations. ',
+          },
+          {
+            term: 'Data Sovereignty',
+            definition:
+              "Concept that digital information is subject to the laws of the country where it's located. ",
+          },
+          {
+            term: 'Framework (Security Framework)',
+            definition:
+              'Documented processes defining policies for implementing and managing security controls (e.g., NIST CSF, ISO 27001). [cite: 182, 183]',
+          },
+          {
+            term: 'GDPR (General Data Protection Regulation)',
+            definition:
+              'EU law on data protection and privacy in the EU and EEA. ',
+          },
+          {
+            term: 'Governance (IT Governance)',
+            definition:
+              'A formal framework ensuring IT investments support business objectives. ',
+          },
+          {
+            term: 'HIPAA (Health Insurance Portability and Accountability Act)',
+            definition:
+              'US federal law protecting sensitive patient health information (PHI). ',
+          },
+          {
+            term: 'Information Assurance (IA)',
+            definition:
+              'Practice of assuring information and managing risks related to its use, processing, storage, and transmission. ',
+          },
+          {
+            term: 'ISO 27001/27002',
+            definition:
+              'International standards for information security management systems (ISMS) and practices. ',
+          },
+          {
+            term: 'NIST (National Institute of Standards and Technology)',
+            definition:
+              'U.S. agency developing standards and guidelines; its Cybersecurity Framework (CSF) is widely adopted. [cite: 309, 310]',
+          },
+          {
+            term: 'Operational Security (OPSEC)',
+            definition:
+              'Process identifying critical info, determining if actions are observable by adversaries, and reducing exploitation. ',
+          },
+          {
+            term: 'PCI DSS (Payment Card Industry Data Security Standard)',
+            definition:
+              'Security standard for organizations handling branded credit cards. ',
+          },
+          {
+            term: 'Personally Identifiable Information (PII)',
+            definition:
+              'Information that, alone or with other data, can identify an individual. ',
+          },
+          {
+            term: 'Privacy',
+            definition:
+              'The right of individuals/groups to keep personal affairs private or control info flow about themselves. ',
+          },
+          {
+            term: 'Protected Health Information (PHI)',
+            definition:
+              'Under HIPAA, health info linked to an individual, created/collected by a Covered Entity. ',
+          },
+          {
+            term: 'Regulation',
+            definition:
+              'A rule or directive made and maintained by an authority. ',
+          },
+          {
+            term: 'Security Audit',
+            definition:
+              "Systematic evaluation of an information system's security against established criteria. ",
+          },
+          {
+            term: 'Security Awareness Training',
+            definition:
+              'Training employees about security threats, policies, and procedures. ',
+          },
+          {
+            term: 'Standard',
+            definition:
+              'Documented agreement with technical specs or criteria for consistent use as rules or guidelines. ',
+          },
+        ],
+        'Cloud & Virtualization Security': [
+          {
+            term: 'CASB (Cloud Access Security Broker)',
+            definition:
+              'Software between cloud users and applications, monitoring activity and enforcing security policies. ',
+          },
+          {
+            term: 'Cloud Computing',
+            definition:
+              'Model for on-demand network access to a shared pool of configurable computing resources. ',
+          },
+          {
+            term: 'Cloud Security',
+            definition:
+              'Policies, technologies, applications, and controls to protect cloud computing infrastructure and data. ',
+          },
+          {
+            term: 'Cloud Security Posture Management (CSPM)',
+            definition:
+              'Tools identifying and remediating risk by automating detection of cloud misconfigurations. ',
+          },
+          {
+            term: 'Containerization',
+            definition:
+              'Lightweight virtualization encapsulating an application in a container with its own operating environment. ',
+          },
+          {
+            term: 'Hypervisor',
+            definition:
+              'Software, firmware, or hardware that creates and runs virtual machines. ',
+          },
+          {
+            term: 'IaaS (Infrastructure as a Service)',
+            definition:
+              'Cloud model where a vendor provides access to computing resources like servers, storage, networking. ',
+          },
+          {
+            term: 'Immutable Infrastructure',
+            definition:
+              'Managing IT resources where components are replaced rather than changed. ',
+          },
+          {
+            term: 'PaaS (Platform as a Service)',
+            definition:
+              'Cloud model providing hardware and software tools (often for app development) over the internet. ',
+          },
+          {
+            term: 'Private Cloud',
+            definition:
+              'Cloud computing delivering scalability and self-service through a proprietary architecture. ',
+          },
+          {
+            term: 'Public Cloud',
+            definition:
+              'Cloud computing where a provider makes resources available to the general public over the Internet. ',
+          },
+          {
+            term: 'SaaS (Software as a Service)',
+            definition:
+              'Software distribution model where a provider hosts apps and makes them available over the Internet. ',
+          },
+          {
+            term: 'Shared Responsibility Model',
+            definition:
+              'In cloud computing, defines security tasks handled by the provider versus the customer. ',
+          },
+          {
+            term: 'Tenant (Cloud Tenant)',
+            definition:
+              'A customer or organization using a shared cloud computing environment. ',
+          },
+          {
+            term: 'VDI (Virtual Desktop Infrastructure)',
+            definition:
+              'Hosting desktop environments on a central server using virtual machines. [cite: 608, 609]',
+          },
+          {
+            term: 'Virtual Machine (VM)',
+            definition:
+              'An emulation of a computer system, based on computer architectures, providing physical computer functionality. ',
+          },
+          {
+            term: 'Virtualization',
+            definition:
+              'Creating a virtual (not actual) version of an OS, server, storage device, or network resources. ',
+          },
+        ],
+        'Web & Application Security': [
+          {
+            term: 'Application Security (AppSec)',
+            definition:
+              'Adding security features within applications during development and post-deployment controls. ',
+          },
+          {
+            term: 'Cookie',
+            definition:
+              "Small piece of data stored on a user's computer by a web browser while Browse a website. ",
+          },
+          {
+            term: 'DevSecOps',
+            definition:
+              'Augmenting DevOps by integrating security practices into the DevOps approach. ',
+          },
+          {
+            term: 'Fuzzing (Fuzz Testing)',
+            definition:
+              'Automated software testing providing invalid, unexpected, or random data as input. ',
+          },
+          {
+            term: 'HTML Injection',
+            definition:
+              'Vulnerability where unvalidated user input is embedded in HTML output. ',
+          },
+          {
+            term: 'OWASP (Open Web Application Security Project)',
+            definition:
+              'Online community producing free resources for web application security (e.g., OWASP Top 10). [cite: 335, 336]',
+          },
+          {
+            term: 'RASP (Runtime Application Self-Protection)',
+            definition:
+              'Security tech built into an app runtime to control execution and prevent real-time attacks. ',
+          },
+          {
+            term: 'Secure Coding Practices',
+            definition:
+              'Guidelines for writing software code to minimize security vulnerabilities. ',
+          },
+          {
+            term: 'Secure SDLC (Software Development Life Cycle)',
+            definition:
+              'Integrating security activities throughout all phases of software development. ',
+          },
+          {
+            term: 'Server-Side Request Forgery (SSRF)',
+            definition:
+              'Web vulnerability allowing an attacker to make the server-side app send HTTP requests to an arbitrary domain. ',
+          },
+          {
+            term: 'Session Hijacking',
+            definition:
+              'Exploiting a valid computer session to gain unauthorized access to information or services. ',
+          },
+          {
+            term: 'Software Bill of Materials (SBOM)',
+            definition:
+              'Formal, machine-readable inventory of software components, dependencies, and their relationships. ',
+          },
+          {
+            term: 'Software Composition Analysis (SCA)',
+            definition:
+              'Tools scanning apps to identify open-source components and their known vulnerabilities. ',
+          },
+          {
+            term: 'Static Analysis',
+            definition:
+              'Analyzing computer software without actually executing it. ',
+          },
+          {
+            term: 'URL Filtering',
+            definition: 'Blocking access to websites based on their URL. ',
+          },
+        ],
+        'Physical & Emerging Security': [
+          {
+            term: 'Air Gap',
+            definition:
+              'A security measure where a computer or network is physically isolated from other networks to prevent unauthorized access. ',
+          },
+          {
+            term: 'Biometrics',
+            definition:
+              'Authentication techniques that rely on measurable physical characteristics that can be automatically checked. ',
+          },
+          {
+            term: 'Bring Your Own Device (BYOD)',
+            definition:
+              'A policy allowing employees to use personally owned mobile devices for work purposes and access company data. ',
+          },
+          {
+            term: 'Dumpster Diving',
+            definition:
+              'Sifting through waste to find discarded items that may contain sensitive information. ',
+          },
+          {
+            term: 'Faraday Cage',
+            definition:
+              'An enclosure used to block electromagnetic fields, preventing signals from entering or leaving. ',
+          },
+          {
+            term: 'Internet of Things (IoT)',
+            definition:
+              'Network of physical devices embedded with electronics, software, and connectivity to exchange data. ',
+          },
+          {
+            term: 'Mobile Device Management (MDM)',
+            definition:
+              'Software allowing IT admins to control, secure, and enforce policies on mobile devices. ',
+          },
+          {
+            term: 'Physical Security',
+            definition:
+              'Measures to deny unauthorized access to facilities, equipment, and resources, and protect personnel/property. ',
+          },
+          {
+            term: 'RFID (Radio-Frequency Identification)',
+            definition:
+              'Uses electromagnetic fields to automatically identify and track tags attached to objects. ',
+          },
+          {
+            term: 'SCADA (Supervisory Control and Data Acquisition)',
+            definition:
+              'System using coded signals over communication channels for remote equipment control. ',
+          },
+          {
+            term: 'Shoulder Surfing',
+            definition:
+              'Directly observing someone to obtain information like passwords or PINs. ',
+          },
+          {
+            term: 'Tailgating (Piggybacking)',
+            definition:
+              'A physical security breach where an unauthorized person follows an authorized individual into a restricted area. ',
+          },
+          {
+            term: 'TEMPEST',
+            definition:
+              'US NSA specification and NATO certification for spying on information systems via leaking emanations. ',
+          },
+          {
+            term: 'Zero Knowledge Proof',
+            definition:
+              'A method where one party proves to another they know a value, without conveying the value itself. ',
+          },
+          {
+            term: 'Zero Trust Architecture (ZTA)',
+            definition:
+              "A security model based on 'never trust, always verify,' assuming no default trust for users or devices. ",
+          },
+        ],
+      }
+
+      let currentCategory = ''
+      let currentCardIndex = 0
+      let cardsInCurrentCategory = []
+
+      const categorySelectionView = document.getElementById(
+        'category-selection-view'
+      )
+      const flashcardView = document.getElementById('flashcard-view')
+      const categoryButtonsContainer = document.getElementById(
+        'category-buttons-container'
+      )
+
+      const currentCategoryDisplay = document.getElementById(
+        'current-category-display'
+      )
+      const cardCounterDisplay = document.getElementById('card-counter')
+      const flashcardDiv = document.getElementById('flashcard')
+      const flashcardTermContentDiv = document.getElementById(
+        'flashcard-term-content'
+      )
+      const flashcardDefinitionContentDiv = document.getElementById(
+        'flashcard-definition-content'
+      )
+
+      const prevCardButton = document.getElementById('prev-card-button')
+      const nextCardButton = document.getElementById('next-card-button')
+      const returnToCategoriesButton = document.getElementById(
+        'return-to-categories-button'
+      )
+      document.getElementById('current-year').textContent =
+        new Date().getFullYear()
+
+      function initializeApp() {
+        populateCategoryButtons()
+        showCategorySelectionView()
+        flashcardDiv.addEventListener('click', flipCard)
+        prevCardButton.addEventListener('click', showPreviousCard)
+        nextCardButton.addEventListener('click', showNextCard)
+        returnToCategoriesButton.addEventListener(
+          'click',
+          showCategorySelectionView
+        )
+      }
+
+      function populateCategoryButtons() {
+        categoryButtonsContainer.innerHTML = ''
+        for (const categoryName in vocabularyData) {
+          const button = document.createElement('button')
+          button.textContent = categoryName
+          button.classList.add('category-button-style')
+          button.setAttribute('title', `Study ${categoryName} terms`)
+          button.addEventListener('click', () => loadCategory(categoryName))
+          categoryButtonsContainer.appendChild(button)
+        }
+      }
+
+      function loadCategory(categoryName) {
+        currentCategory = categoryName
+        cardsInCurrentCategory = vocabularyData[categoryName]
+        currentCardIndex = 0
+        currentCategoryDisplay.textContent = categoryName
+        displayCard()
+        showFlashcardView()
+      }
+
+      function displayCard() {
+        if (!cardsInCurrentCategory || cardsInCurrentCategory.length === 0) {
+          flashcardTermContentDiv.textContent = 'No cards in this category.'
+          flashcardDefinitionContentDiv.textContent =
+            'Please select another category.'
+          updateCardCounter(true) // Indicate empty state
+          updateNavigationButtons()
+          return
+        }
+        const cardData = cardsInCurrentCategory[currentCardIndex]
+        flashcardTermContentDiv.textContent = cardData.term
+        // Simple citation removal for cleaner display, if present.
+        flashcardDefinitionContentDiv.innerHTML = cardData.definition.replace(
+          / \//g,
+          ''
+        )
+        flashcardDiv.classList.remove('flipped')
+        // Scroll definition to top when card is displayed or flipped to definition
+        const definitionFace = flashcardDiv.querySelector('.flashcard-back')
+        if (definitionFace) definitionFace.scrollTop = 0
+
+        updateCardCounter()
+        updateNavigationButtons()
+      }
+
+      function flipCard() {
+        flashcardDiv.classList.toggle('flipped')
+        // If flipping to definition (back), scroll to top
+        if (flashcardDiv.classList.contains('flipped')) {
+          const definitionFace = flashcardDiv.querySelector('.flashcard-back')
+          if (definitionFace) definitionFace.scrollTop = 0
+        }
+      }
+
+      function showPreviousCard() {
+        if (currentCardIndex > 0) {
+          currentCardIndex--
+          displayCard()
+        }
+      }
+
+      function showNextCard() {
+        if (currentCardIndex < cardsInCurrentCategory.length - 1) {
+          currentCardIndex++
+          displayCard()
+        }
+      }
+
+      function updateCardCounter(isEmpty = false) {
+        if (isEmpty) {
+          cardCounterDisplay.textContent = `Card 0 of 0`
+        } else {
+          cardCounterDisplay.textContent = `Card ${currentCardIndex + 1} of ${
+            cardsInCurrentCategory.length
+          }`
+        }
+      }
+
+      function updateNavigationButtons() {
+        if (!cardsInCurrentCategory || cardsInCurrentCategory.length === 0) {
+          prevCardButton.disabled = true
+          nextCardButton.disabled = true
+          return
+        }
+        prevCardButton.disabled = currentCardIndex === 0
+        nextCardButton.disabled =
+          currentCardIndex >= cardsInCurrentCategory.length - 1
+      }
+
+      function showCategorySelectionView() {
+        categorySelectionView.classList.remove('hidden')
+        flashcardView.classList.add('hidden')
+      }
+
+      function showFlashcardView() {
+        categorySelectionView.classList.add('hidden')
+        flashcardView.classList.remove('hidden')
+      }
+
+      initializeApp()
+    </script>
+  </body>
+</html>
